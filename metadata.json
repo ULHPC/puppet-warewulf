@@ -2,7 +2,7 @@
   "name": "ULHPC-warewulf",
   "version": "0.1.0",
   "author": "UL HPC Team",
-  "summary": "Puppet module to configure and manage warewulf ",
+  "summary": "Puppet module to configure and manage warewulf",
   "license": "Apache-2.0",
   "source": "git@github.com:ULHPC/puppet-warewulf.git",
   "dependencies": [],
@@ -10,9 +10,9 @@
     {
       "operatingsystem": "CentOS",
       "operatingsystemrelease": [
-        "7",
         "8",
-        "9"
+        "9",
+        "10"
       ]
     },
     {
@@ -24,9 +24,9 @@
     {
       "operatingsystem": "RedHat",
       "operatingsystemrelease": [
-        "7",
         "8",
-        "9"
+        "9",
+        "10"
       ]
     },
     {
@@ -38,13 +38,17 @@
     {
       "operatingsystem": "Rocky",
       "operatingsystemrelease": [
-        "8"
+        "8",
+        "9",
+        "10"
       ]
     },
     {
       "operatingsystem": "AlmaLinux",
       "operatingsystemrelease": [
-        "8"
+        "8",
+        "9",
+        "10"
       ]
     }
   ],

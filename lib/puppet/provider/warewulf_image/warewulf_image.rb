@@ -24,16 +24,33 @@ class Puppet::Provider::WarewulfImage::WarewulfImage < Puppet::ResourceApi::Simp
     end
   end
 
+  # Add an image to Warewulf.
+  #
+  # @param context [Puppet::ResourceApi::BaseContext] The context for logging and debugging
+  # @param name [String] The image name to add
+  # @param should [Hash] additional parameters
+  # @return [String] The path of wwctl.
+  #
   def create(context, name, should)
     context.debug("Importing image '#{name}' with #{should.inspect}")
     wwctl('image', 'import', "docker://#{should[:oci_repository_url]}/#{name}")
   end
 
+  # Remove an image from Warewulf.
+  #
+  # @param context [Puppet::ResourceApi::BaseContext] The context for logging and debugging
+  # @param name [String] The image name to remove
+  # @return [String] The path of wwctl.
+  #
   def delete(context, name)
     context.debug("Deleting image '#{name}'")
     wwctl('image', 'delete', name)
   end
 
+  # Get the path of wwctl.
+  #
+  # @return [String] The path of wwctl.
+  #
   def wwctl_cmd
     @wwctl_cmd ||= Puppet::Util::Execution.execute('which wwctl 2> /dev/null')
   end

@@ -3,10 +3,12 @@
 Facter.add(:warewulf) do
   confine kernel: :linux
 
+  @wwctl_cmd = Facter::Util::Resolution.which('wwctl')
+  confine { @wwctl_cmd }
+
   setcode do
     warewulf = {}
-    wwctl = Facter::Core::Execution.execute('which wwctl')
-    warewulf['images'] = Facter::Core::Execution.execute("#{wwctl} image ls").strip.lines[2..].map(&:strip)
+    warewulf['images'] = Facter::Core::Execution.execute("#{@wwctl_cmd} image ls").strip.lines[2..].map(&:strip)
 
     warewulf
   end

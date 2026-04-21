@@ -9,7 +9,7 @@ describe 'warewulf fact specs', type: :fact do
   before do
     Facter.clear
     allow(Facter.fact(:kernel)).to receive(:value).and_return('Linux')
-    allow(Facter::Core::Execution).to receive(:execute).with('which wwctl').and_return('/bin/wwctl')
+    allow(Facter::Util::Resolution).to receive(:which).with('wwctl').and_return('/bin/wwctl')
   end
 
   describe 'warewulf' do

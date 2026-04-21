@@ -65,7 +65,7 @@ rockylinux-10
     it 'deletes the resource' do
       provider.delete(context, 'foo')
       expect(Puppet::Util::Execution).to have_received(:execute)
-        .with(['/bin/wwctl', 'image', 'delete', 'foo'])
+        .with(['/bin/wwctl', 'image', 'delete', 'foo', '--yes'])
     end
   end
 end

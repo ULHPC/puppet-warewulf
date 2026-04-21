@@ -44,7 +44,7 @@ class Puppet::Provider::WarewulfImage::WarewulfImage < Puppet::ResourceApi::Simp
   #
   def delete(context, name)
     context.debug("Deleting image '#{name}'")
-    wwctl('image', 'delete', name)
+    wwctl('image', 'delete', name, '--yes')
   end
 
   # Get the path of wwctl.

@@ -52,7 +52,7 @@ class Puppet::Provider::WarewulfImage::WarewulfImage < Puppet::ResourceApi::Simp
   # @return [String] The path of wwctl.
   #
   def wwctl_cmd
-    @wwctl_cmd ||= Puppet::Util::Execution.execute('which wwctl 2> /dev/null')
+    @wwctl_cmd ||= Puppet::Util::Execution.execute('which wwctl 2> /dev/null').strip
   end
 
   # Executes the `wwctl` command with the specified arguments.

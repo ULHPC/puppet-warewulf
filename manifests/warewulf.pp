@@ -7,6 +7,9 @@
 #   Warewulf listen address 
 #   The address is in the CIDR format
 #
+# @param overlays_repo_src
+#   The git url of the overlays repository
+#
 # @param oci_username
 #   Username used to connect to the OCI registry
 #
@@ -16,6 +19,7 @@
 class profile::warewulf (
   String $version,
   Variant[Stdlib::IP::Address::V4::CIDR, Stdlib::IP::Address::V6::CIDR] $address,
+  String $overlays_repo_src,
   Optional[String] $oci_username = undef,
   Optional[Sensitive[String]] $oci_password = undef,
 ) {
@@ -51,11 +55,24 @@ class profile::warewulf (
     refreshonly => true,
   }
 
+  vcsrepo { '/usr/local/src/warewulf-overlays':
+    ensure   => latest,
+    provider => git,
+    source   => $overlays_repo_src,
+  }
+
+  file { '/var/lib/warewulf/overlays':
+    ensure  => 'link',
+    target  => '/usr/local/src/warewulf-overlays/overlays',
+    require => Vcsrepo['/usr/local/src/warewulf-overlays'],
+  }
+
   exec { 'warewulf_overlay_build':
     command     => 'wwctl overlay build',
     environment => 'HOME=/root',
-    subscribe   => Exec['warewulf_configure'],
+    subscribe   => [Exec['warewulf_configure'], Vcsrepo['/usr/local/src/warewulf-overlays']],
     refreshonly => true,
+    require     => File['/var/lib/warewulf/overlays'],
   }
 
   service { 'warewulfd':

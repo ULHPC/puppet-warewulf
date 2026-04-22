@@ -16,10 +16,18 @@
 # @param oci_password
 #   Password used to connect to the OCI registry
 #
+# @param nodes
+#   Compute nodes configurations
+# 
+# @param ipmi_password
+#   Compute nodes ipmi password
+#
 class profile::warewulf (
   String $version,
   Variant[Stdlib::IP::Address::V4::CIDR, Stdlib::IP::Address::V6::CIDR] $address,
   String $overlays_repo_src,
+  Hash $nodes,
+  Sensitive[String] $ipmi_password,
   Optional[String] $oci_username = undef,
   Optional[Sensitive[String]] $oci_password = undef,
 ) {
@@ -47,6 +55,14 @@ class profile::warewulf (
     require => Package['warewulf'],
   }
 
+  file { '/etc/warewulf/nodes.conf':
+    ensure  => 'file',
+    content => Sensitive(template("profile/warewulf/${facts['site']}/nodes.conf.erb")),
+    group   => 'warewulf',
+    mode    => '0640',
+    require => Package['warewulf'],
+  }
+
   exec { 'warewulf_configure':
     command     => 'wwctl configure --all',
     environment => 'HOME=/root',
@@ -70,7 +86,7 @@ class profile::warewulf (
   exec { 'warewulf_overlay_build':
     command     => 'wwctl overlay build',
     environment => 'HOME=/root',
-    subscribe   => [Exec['warewulf_configure'], Vcsrepo['/usr/local/src/warewulf-overlays']],
+    subscribe   => [Exec['warewulf_configure'], Vcsrepo['/usr/local/src/warewulf-overlays'], File['/etc/warewulf/nodes.conf']],
     refreshonly => true,
     require     => File['/var/lib/warewulf/overlays'],
   }

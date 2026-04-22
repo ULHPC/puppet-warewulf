@@ -37,6 +37,7 @@ class profile::warewulf (
 
   exec { 'warewulf_configure':
     command     => 'wwctl configure --all',
+    environment => 'HOME=/root',
     subscribe   => File['/etc/warewulf/warewulf.conf'],
     notify      => Service['warewulfd'],
     refreshonly => true,

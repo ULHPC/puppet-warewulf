@@ -7,9 +7,17 @@
 #   Warewulf listen address 
 #   The address is in the CIDR format
 #
+# @param oci_username
+#   Username used to connect to the OCI registry
+#
+# @param oci_password
+#   Password used to connect to the OCI registry
+#
 class profile::warewulf (
   String $version,
   Variant[Stdlib::IP::Address::V4::CIDR, Stdlib::IP::Address::V6::CIDR] $address,
+  Optional[String] $oci_username = undef,
+  Optional[Sensitive[String]] $oci_password = undef,
 ) {
   if ($facts['os']['family'] != 'RedHat') {
     fail('profile::warewulf only supports RedHat family systems')
@@ -54,5 +62,31 @@ class profile::warewulf (
     ensure  => 'running',
     enable  => true,
     require => [[Package['tftp-server'], Package['warewulf'], File['/etc/warewulf/warewulf.conf']]],
+  }
+
+  file { '/root/.bash_private':
+    ensure => file,
+  }
+
+  file_line { 'WAREWULF_OCI_USERNAME':
+    ensure            => $oci_username ? {
+      undef   => absent,
+      default => present,
+    },
+    line              => "export WAREWULF_OCI_USERNAME='${oci_username}'",
+    match             => '^export WAREWULF_OCI_USERNAME=.*$',
+    path              => '/root/.bash_private',
+    match_for_absence => true,
+  }
+
+  file_line { 'WAREWULF_OCI_PASSWORD':
+    ensure            => $oci_password ? {
+      undef   => absent,
+      default => present,
+    },
+    line              => Sensitive("export WAREWULF_OCI_PASSWORD='${oci_password.unwrap}'"),
+    match             => '^export WAREWULF_OCI_PASSWORD=.*$',
+    path              => '/root/.bash_private',
+    match_for_absence => true,
   }
 }

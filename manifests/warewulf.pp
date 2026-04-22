@@ -75,11 +75,14 @@ class profile::warewulf (
     ensure   => latest,
     provider => git,
     source   => $overlays_repo_src,
+    umask    => '027',
   }
 
   file { '/var/lib/warewulf/overlays':
     ensure  => 'link',
     target  => '/usr/local/src/warewulf-overlays/overlays',
+    group   => 'warewulf',
+    mode    => '0750',
     require => Vcsrepo['/usr/local/src/warewulf-overlays'],
   }
 

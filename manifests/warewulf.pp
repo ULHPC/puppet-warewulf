@@ -10,13 +10,18 @@ class warewulf (
     fail('profile::warewulf only supports RedHat family systems')
   }
 
+  package { 'tftp-server':
+    ensure => '5.2',
+  }
+
   package { 'warewulf':
     ensure => 'present',
     source => "https://github.com/warewulf/warewulf/releases/download/v${version}/warewulf-${version}-1.el${facts['os']['release']['major']}.${facts['os']['architecture']}.rpm",
   }
 
   service { 'warewulfd':
-    ensure => 'running',
-    enable => true,
+    ensure  => 'running',
+    enable  => true,
+    require => [[Package['tftp-server'], Package['warewulf']]],
   }
 }

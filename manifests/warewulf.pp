@@ -43,6 +43,13 @@ class profile::warewulf (
     refreshonly => true,
   }
 
+  exec { 'warewulf_overlay_build':
+    command     => 'wwctl overlay build',
+    environment => 'HOME=/root',
+    subscribe   => Exec['warewulf_configure'],
+    refreshonly => true,
+  }
+
   service { 'warewulfd':
     ensure  => 'running',
     enable  => true,

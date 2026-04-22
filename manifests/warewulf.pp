@@ -4,20 +4,12 @@
 #   Select the correct Warewulf version
 #
 # @param address
-#   Warewulf listen address
-#
-# @param netmask
-#   Warewulf listen address netmask
-#
-# @param network
-#   Warewulf listen address network
-#
+#   Warewulf listen address 
+#   The address is in the CIDR format
 #
 class profile::warewulf (
   String $version,
-  String $address,
-  String $netmask,
-  String $network,
+  Variant[Stdlib::IP::Address::V4::CIDR, Stdlib::IP::Address::V6::CIDR] $address,
 ) {
   if ($facts['os']['family'] != 'RedHat') {
     fail('profile::warewulf only supports RedHat family systems')
@@ -34,7 +26,7 @@ class profile::warewulf (
 
   systemd::dropin_file { 'tftp-server.conf':
     unit    => 'tftp.socket',
-    content => "[Socket]\nListenDatagram=\nListenDatagram=${address}:69\n",
+    content => "[Socket]\nListenDatagram=\nListenDatagram=${split($address, '/')[0]}:69\n",
   } -> Package['tftp-server']
 
   file { '/etc/warewulf/warewulf.conf':

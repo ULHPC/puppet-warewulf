@@ -145,5 +145,6 @@ class profile::warewulf (
 
   File['/etc/warewulf/nodes.conf']
   -> Exec['warewulf_configure']
+  -> Resources['warewulf_image']
   -> Warewulf_image <| |>
 }

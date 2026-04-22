@@ -22,11 +22,19 @@
 # @param ipmi_password
 #   Compute nodes ipmi password
 #
+# @param images
+#   List of warewulf images
+#
+# @param oci_url
+#   Default OCI repository url
+#
 class profile::warewulf (
   String $version,
   Variant[Stdlib::IP::Address::V4::CIDR, Stdlib::IP::Address::V6::CIDR] $address,
   String $overlays_repo_src,
   Hash $nodes,
+  Array[String] $images,
+  String $oci_url,
   Sensitive[String] $ipmi_password,
   Optional[String] $oci_username = undef,
   Optional[Sensitive[String]] $oci_password = undef,
@@ -125,4 +133,17 @@ class profile::warewulf (
     path              => '/root/.bash_private',
     match_for_absence => true,
   }
+
+  $images.each |String $image| {
+    warewulf_image { $image:
+      ensure             => present,
+      oci_repository_url => $oci_url,
+    }
+  }
+
+  resources { 'warewulf_image': purge => true }
+
+  File['/etc/warewulf/nodes.conf']
+  -> Exec['warewulf_configure']
+  -> Warewulf_image <| |>
 }

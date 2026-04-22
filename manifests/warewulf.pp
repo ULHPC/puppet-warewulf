@@ -5,11 +5,19 @@
 #
 # @param address
 #   Warewulf listen address
-#   This is actually used to manage tftp-server listend address
+#
+# @param netmask
+#   Warewulf listen address netmask
+#
+# @param network
+#   Warewulf listen address network
+#
 #
 class profile::warewulf (
   String $version,
-  String $address
+  String $address,
+  String $netmask,
+  String $network,
 ) {
   if ($facts['os']['family'] != 'RedHat') {
     fail('profile::warewulf only supports RedHat family systems')
@@ -29,9 +37,22 @@ class profile::warewulf (
     content => "[Socket]\nListenDatagram=\nListenDatagram=${address}:69\n",
   } -> Package['tftp-server']
 
+  file { '/etc/warewulf/warewulf.conf':
+    ensure  => 'file',
+    content => template("profile/warewulf/${facts['site']}/warewulf.conf.erb"),
+    require => Package['warewulf'],
+  }
+
+  exec { 'warewulf_configure':
+    command     => 'wwctl configure --all',
+    subscribe   => File['/etc/warewulf/warewulf.conf'],
+    notify      => Service['warewulfd'],
+    refreshonly => true,
+  }
+
   service { 'warewulfd':
     ensure  => 'running',
     enable  => true,
-    require => [[Package['tftp-server'], Package['warewulf']]],
+    require => [[Package['tftp-server'], Package['warewulf'], File['/etc/warewulf/warewulf.conf']]],
   }
 }

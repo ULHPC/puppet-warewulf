@@ -5,7 +5,12 @@
   "summary": "Puppet module to configure and manage warewulf",
   "license": "Apache-2.0",
   "source": "git@github.com:ULHPC/puppet-warewulf.git",
-  "dependencies": [],
+  "dependencies": [
+    {
+      "name": "puppetlabs/stdlib",
+      "version_requirement": ">= 4.13.1 < 10.0.0"
+    }
+  ],
   "operatingsystem_support": [
     {
       "operatingsystem": "CentOS",

@@ -1,0 +1,5 @@
+nodeprofiles:
+<%= scope.call_function('stdlib::to_yaml', [@nodeprofiles]).sub(/\A---\s*\n/, '').gsub(/^/, '  ') %>
+
+nodes:
+<%= scope.call_function('stdlib::to_yaml', [@nodes]).sub(/\A---\s*\n/, '').gsub(/^/, '  ') %>

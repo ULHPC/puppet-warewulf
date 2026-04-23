@@ -1,0 +1,14 @@
+warewulf::manage_tftp_server: true
+
+warewulf::install::enable: true
+warewulf::install::version: 4.6.5
+warewulf::install::tftp_server_ensure: "latest"
+
+warewulf::config::manage_images: false
+warewulf::config::purge_images: false
+warewulf::config::images::default_oci_repository_url: docker://ghcr.io/warewulf
+
+warewulf::service::manage: true
+warewulf::service::enable: true
+warewulf::service::ensure: running
+warewulf::service::service_name: warewulfd

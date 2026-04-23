@@ -107,7 +107,7 @@ class warewulf::config (
     }
   }
 
-  $warewulf_config = merge($config, { 'ipaddr' => $address })
+  $warewulf_config = $config + { 'ipaddr' => $address }
   file { '/etc/warewulf/warewulf.conf':
     ensure  => 'file',
     content => regsubst(stdlib::to_yaml($warewulf_config), '\A---\s*\n', ''),

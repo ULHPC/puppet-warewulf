@@ -1,5 +1,17 @@
 nodeprofiles:
-<%= scope.call_function('stdlib::to_yaml', [@nodeprofiles]).sub(/\A---\s*\n/, '').gsub(/^/, '  ') %>
+<%
+nodeprofiles = @nodeprofiles
+if nodeprofiles.is_a?(Puppet::Pops::Types::PSensitiveType::Sensitive)
+  nodeprofiles = scope.call_function('unwrap', [nodeprofiles])
+end
+-%>
+<%= scope.call_function('stdlib::to_yaml', [nodeprofiles]).sub(/\A---\s*\n/, '').gsub(/^/, '  ') %>
 
 nodes:
-<%= scope.call_function('stdlib::to_yaml', [@nodes]).sub(/\A---\s*\n/, '').gsub(/^/, '  ') %>
+<%
+nodes = @nodes
+if nodes.is_a?(Puppet::Pops::Types::PSensitiveType::Sensitive)
+  nodes = scope.call_function('unwrap', [nodes])
+end
+-%>
+<%= scope.call_function('stdlib::to_yaml', [nodes]).sub(/\A---\s*\n/, '').gsub(/^/, '  ') %>

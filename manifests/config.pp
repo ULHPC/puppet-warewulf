@@ -91,9 +91,9 @@
 #
 class warewulf::config (
   Variant[Stdlib::IP::Address::V4::CIDR, Stdlib::IP::Address::V6::CIDR] $address,
-  Hash $config,
-  Hash $nodeprofiles,
-  Hash $nodes,
+  Variant[Hash, Sensitive[Hash]] $config,
+  Variant[Hash, Sensitive[Hash]] $nodeprofiles,
+  Variant[Hash, Sensitive[Hash]] $nodes,
   Boolean $manage_images,
   Boolean $purge_images,
   String $default_oci_repository_url,
@@ -115,7 +115,7 @@ class warewulf::config (
 
   file { '/etc/warewulf/nodes.conf':
     ensure  => 'file',
-    content => Sensitive(template('nodes.conf.erb')),
+    content => Sensitive(template('warewulf/nodes.conf.erb')),
     group   => 'warewulf',
     mode    => '0640',
   }

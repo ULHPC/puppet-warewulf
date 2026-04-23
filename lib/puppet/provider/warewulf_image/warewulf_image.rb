@@ -33,7 +33,10 @@ class Puppet::Provider::WarewulfImage::WarewulfImage < Puppet::ResourceApi::Simp
   #
   def create(context, name, should)
     context.debug("Importing image '#{name}' with #{should.inspect}")
-    wwctl('image', 'import', "docker://#{should[:oci_repository_url]}/#{name}")
+
+    oci_remote_name = should[:oci_remote_name] || name
+
+    wwctl('image', 'import', "docker://#{should[:oci_repository_url]}/#{oci_remote_name}", name)
   end
 
   # Remove an image from Warewulf.

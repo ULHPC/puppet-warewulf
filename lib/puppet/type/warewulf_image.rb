@@ -26,6 +26,11 @@ Puppet::ResourceApi.register_type(
       desc: 'The name of the Warewulf image.',
       behaviour: :namevar,
     },
+    oci_remote_name: {
+      type: 'Optional[String]',
+      desc: 'The OCI name on the repository.',
+      behaviour: :parameter,
+    },
     oci_repository_url: {
       type: 'String',
       desc: 'The OCI repository url.',

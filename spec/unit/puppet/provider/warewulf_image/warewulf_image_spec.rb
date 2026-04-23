@@ -54,10 +54,16 @@ rockylinux-10
   end
 
   describe 'create(context, name, should)' do
-    it 'creates the resource' do
+    it 'import an image' do
       provider.create(context, 'a', name: 'a', ensure: 'present', oci_repository_url: 'registry.example.com')
       expect(Puppet::Util::Execution).to have_received(:execute)
-        .with(['/bin/wwctl', 'image', 'import', 'docker://registry.example.com/a'])
+        .with(['/bin/wwctl', 'image', 'import', 'docker://registry.example.com/a', 'a'])
+    end
+
+    it 'import and rename an image' do
+      provider.create(context, 'a', name: 'a', ensure: 'present', oci_remote_name: 'toaster', oci_repository_url: 'registry.example.com')
+      expect(Puppet::Util::Execution).to have_received(:execute)
+        .with(['/bin/wwctl', 'image', 'import', 'docker://registry.example.com/toaster', 'a'])
     end
   end
 

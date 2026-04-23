@@ -170,6 +170,7 @@ class warewulf::config (
       warewulf_image { $image:
         ensure             => present,
         oci_repository_url => pick($params['oci_repository_url'], $default_oci_repository_url),
+        oci_remote_name    => $params['oci_remote_name'],
       }
     }
 

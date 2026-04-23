@@ -97,7 +97,7 @@ class warewulf::config (
   Boolean $manage_images,
   Boolean $purge_images,
   String $default_oci_repository_url,
-  Optional[Variant[Hash[String, Hash], Array[String]]] $images = undef,
+  Optional[Variant[Hash[String, Optional[Hash]], Array[String]]] $images = undef,
   Optional[String] $overlays_repo_src = undef,
 ) {
   if ($warewulf::manage_tftp_server) {
@@ -161,7 +161,12 @@ class warewulf::config (
       default       => $images,
     }
 
-    $images_hash.each |String $image, Hash $params| {
+    $images_hash.each |String $image, Optional[Hash] $image_params| {
+      $params = $image_params ? {
+        undef => {},
+        default => $image_params,
+      }
+
       warewulf_image { $image:
         ensure             => present,
         oci_repository_url => pick($params['oci_repository_url'], $default_oci_repository_url),

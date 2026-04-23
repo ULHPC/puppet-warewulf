@@ -107,7 +107,7 @@ warewulf::config::nodes:
           ipaddr: 172.23.1.103
 warewulf::config::manage_images: true
 warewulf::config::purge_images: false
-warewulf::config::default_oci_repository_url: 'docker://ghcr.io/warewulf'
+warewulf::config::default_oci_repository_url: 'ghcr.io/warewulf'
 warewulf::config::images:
   rocky8:
     oci_repository_url: 'docker://ghcr.io/warewulf/rocky:8'
@@ -140,7 +140,7 @@ into the generated `warewulf.conf`.
 
 ##### <a name="-warewulf--config--config"></a>`config`
 
-Data type: `Hash`
+Data type: `Variant[Hash, Sensitive[Hash]]`
 
 Base configuration hash for Warewulf. This will be merged with
 additional required values (e.g. `ipaddr`) before being rendered
@@ -148,13 +148,13 @@ into `/etc/warewulf/warewulf.conf`.
 
 ##### <a name="-warewulf--config--nodeprofiles"></a>`nodeprofiles`
 
-Data type: `Hash`
+Data type: `Variant[Hash, Sensitive[Hash]]`
 
 Hash defining Warewulf node profiles.
 
 ##### <a name="-warewulf--config--nodes"></a>`nodes`
 
-Data type: `Hash`
+Data type: `Variant[Hash, Sensitive[Hash]]`
 
 Hash defining individual nodes and their configuration.
 
@@ -183,7 +183,7 @@ per image.
 
 ##### <a name="-warewulf--config--images"></a>`images`
 
-Data type: `Opitonal[Variant[Hash[String, Hash], Array[String]]]`
+Data type: `Optional[Variant[Hash[String, Optional[Hash]], Array[String]]]`
 
 Image definitions, either:
 - Hash[String, Hash]: image name => parameter hash

@@ -6,7 +6,7 @@ warewulf::install::tftp_server_ensure: "latest"
 
 warewulf::config::manage_images: false
 warewulf::config::purge_images: false
-warewulf::config::images::default_oci_repository_url: docker://ghcr.io/warewulf
+warewulf::config::images::default_oci_repository_url: ghcr.io/warewulf
 
 warewulf::service::manage: true
 warewulf::service::enable: true

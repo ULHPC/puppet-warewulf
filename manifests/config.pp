@@ -80,7 +80,7 @@
 #             ipaddr: 172.23.1.103
 #   warewulf::config::manage_images: true
 #   warewulf::config::purge_images: false
-#   warewulf::config::default_oci_repository_url: 'docker://ghcr.io/warewulf'
+#   warewulf::config::default_oci_repository_url: 'ghcr.io/warewulf'
 #   warewulf::config::images:
 #     rocky8:
 #       oci_repository_url: 'docker://ghcr.io/warewulf/rocky:8'

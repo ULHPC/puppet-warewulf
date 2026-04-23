@@ -4,19 +4,330 @@
 
 ## Table of Contents
 
+### Classes
+
+* [`warewulf`](#warewulf): Manage the Warewulf provisioning system.
+* [`warewulf::config`](#warewulf--config): Configures the Warewulf provisioning system.
+* [`warewulf::install`](#warewulf--install): Installs the Warewulf software and optional dependencies.
+* [`warewulf::service`](#warewulf--service): Manages the Warewulf service resource.
+
 ### Resource types
 
 * [`warewulf_image`](#warewulf_image): a warewulf_image type
+
+## Classes
+
+### <a name="warewulf"></a>`warewulf`
+
+The `warewulf` class is the primary entry point for this module. It
+orchestrates the installation, configuration, and service management
+of Warewulf by including and ordering the internal classes:
+`warewulf::install`, `warewulf::config`, and `warewulf::service`.
+
+The class itself does not manage resources directly; instead, it
+delegates all functionality to its component classes and ensures
+they are applied in the correct order.
+
+#### Examples
+
+##### Basic usage
+
+```puppet
+include warewulf
+```
+
+##### With parameters
+
+```puppet
+class { 'warewulf':
+  manage_tftp_server => true,
+}
+```
+
+#### Parameters
+
+The following parameters are available in the `warewulf` class:
+
+* [`manage_tftp_server`](#-warewulf--manage_tftp_server)
+
+##### <a name="-warewulf--manage_tftp_server"></a>`manage_tftp_server`
+
+Data type: `Boolean`
+
+Specifies whether the TFTP server should be managed by this module.
+
+Default value: `true`
+
+### <a name="warewulf--config"></a>`warewulf::config`
+
+This private class manages the configuration of Warewulf, including
+core configuration files, node definitions, overlays, and optional
+image management. It also integrates with system services and triggers
+necessary reconfiguration commands when configuration changes occur.
+
+This class is intended to be driven via Hiera data and should not be
+declared directly by users. It is included and managed by the main
+`warewulf` class.
+
+* **Note** - If `warewulf::manage_tftp_server` is enabled, a systemd drop-in
+  configuration is created to bind the TFTP socket to the specified IP.
+- Configuration changes trigger `wwctl configure --all`.
+- Overlay builds are triggered automatically when relevant resources
+  change.
+- Image resources can be managed dynamically via the defined type
+  `warewulf_image`.
+
+#### Examples
+
+##### Hiera configuration
+
+```puppet
+warewulf::config::address: '192.168.1.1/24'
+warewulf::config::config:
+  warewulf:
+    port: 9873
+    secure: true
+warewulf::config::nodeprofiles:
+  default:
+    comment: This profile is automatically included for each node
+    cluster name: example
+    image name: rocky10
+    runtime overlay:
+      - hosts
+      - ssh.authorized_keys
+warewulf::config::nodes:
+  node-1:
+      profiles:
+        - default
+      ipmi:
+        ipaddr: 172.23.2.103
+      network devices:
+        default:
+          hwaddr: b8:2a:72:fd:5e:7c
+          ipaddr: 172.23.1.103
+warewulf::config::manage_images: true
+warewulf::config::purge_images: false
+warewulf::config::default_oci_repository_url: 'docker://ghcr.io/warewulf'
+warewulf::config::images:
+  rocky8:
+    oci_repository_url: 'docker://ghcr.io/warewulf/rocky:8'
+warewulf::config::images: # or as an array of string
+  - rocky8
+  - rocky10
+warewulf::config::overlays_repo_src: 'https://github.com/example/warewulf-overlays.git'
+```
+
+#### Parameters
+
+The following parameters are available in the `warewulf::config` class:
+
+* [`address`](#-warewulf--config--address)
+* [`config`](#-warewulf--config--config)
+* [`nodeprofiles`](#-warewulf--config--nodeprofiles)
+* [`nodes`](#-warewulf--config--nodes)
+* [`manage_images`](#-warewulf--config--manage_images)
+* [`purge_images`](#-warewulf--config--purge_images)
+* [`default_oci_repository_url`](#-warewulf--config--default_oci_repository_url)
+* [`images`](#-warewulf--config--images)
+* [`overlays_repo_src`](#-warewulf--config--overlays_repo_src)
+
+##### <a name="-warewulf--config--address"></a>`address`
+
+Data type: `Variant[Stdlib::IP::Address::V4::CIDR, Stdlib::IP::Address::V6::CIDR]`
+
+The IP address (CIDR format) used by Warewulf. This value is injected
+into the generated `warewulf.conf`.
+
+##### <a name="-warewulf--config--config"></a>`config`
+
+Data type: `Hash`
+
+Base configuration hash for Warewulf. This will be merged with
+additional required values (e.g. `ipaddr`) before being rendered
+into `/etc/warewulf/warewulf.conf`.
+
+##### <a name="-warewulf--config--nodeprofiles"></a>`nodeprofiles`
+
+Data type: `Hash`
+
+Hash defining Warewulf node profiles.
+
+##### <a name="-warewulf--config--nodes"></a>`nodes`
+
+Data type: `Hash`
+
+Hash defining individual nodes and their configuration.
+
+##### <a name="-warewulf--config--manage_images"></a>`manage_images`
+
+Data type: `Boolean`
+
+Whether Warewulf images should be managed by this module.
+
+Default value: `false`
+
+##### <a name="-warewulf--config--purge_images"></a>`purge_images`
+
+Data type: `Boolean`
+
+If `true`, unmanaged `warewulf_image` resources will be purged.
+
+Default value: `false`
+
+##### <a name="-warewulf--config--default_oci_repository_url"></a>`default_oci_repository_url`
+
+Data type: `String`
+
+Default OCI repository URL used when defining images, unless overridden
+per image.
+
+##### <a name="-warewulf--config--images"></a>`images`
+
+Data type: `Opitonal[Variant[Hash[String, Hash], Array[String]]]`
+
+Image definitions, either:
+- Hash[String, Hash]: image name => parameter hash
+- Array[String]: list of image names (uses default parameters)
+Only used if `manage_images` is `true`.
+
+Default value: `undef`
+
+##### <a name="-warewulf--config--overlays_repo_src"></a>`overlays_repo_src`
+
+Data type: `Optional[String]`
+
+Git repository URL for Warewulf overlays. If provided, the repository
+is cloned and used as the overlays source.
+
+Default value: `undef`
+
+### <a name="warewulf--install"></a>`warewulf::install`
+
+This private class handles the installation of Warewulf and, optionally,
+the TFTP server package. Installation is currently supported for RedHat
+family operating systems. The Warewulf package is installed from a
+version-specific remote RPM source.
+
+This class is intended to be driven via Hiera data and should not be
+declared directly by users. It is included and managed by the main
+`warewulf` class.
+
+#### Examples
+
+##### Hiera configuration
+
+```puppet
+warewulf::install::enable: true
+warewulf::install::warewulf_version: '4.5.0'
+warewulf::install::tftp_server_ensure: 'present'
+```
+
+#### Parameters
+
+The following parameters are available in the `warewulf::install` class:
+
+* [`enable`](#-warewulf--install--enable)
+* [`warewulf_version`](#-warewulf--install--warewulf_version)
+* [`tftp_server_ensure`](#-warewulf--install--tftp_server_ensure)
+
+##### <a name="-warewulf--install--enable"></a>`enable`
+
+Data type: `Boolean`
+
+Controls whether installation is performed.
+
+Default value: `true`
+
+##### <a name="-warewulf--install--warewulf_version"></a>`warewulf_version`
+
+Data type: `String`
+
+The version of Warewulf to install. This value is used to construct
+the download URL for the RPM package.
+
+##### <a name="-warewulf--install--tftp_server_ensure"></a>`tftp_server_ensure`
+
+Data type: `String`
+
+Desired state of the TFTP server package (e.g. `present`, `absent`).
+This parameter is only used if `warewulf::manage_tftp_server` is `true`.
+
+Default value: `'latest'`
+
+### <a name="warewulf--service"></a>`warewulf::service`
+
+This class is intended to be driven via Hiera data and should not be
+declared directly by users. It is included and managed by the main
+`warewulf` class.
+
+#### Examples
+
+##### Hiera configuration
+
+```puppet
+warewulf::service::manage: true
+warewulf::service::enable: true
+warewulf::service::ensure: running
+warewulf::service::service_name: warewulfd
+```
+
+#### Parameters
+
+The following parameters are available in the `warewulf::service` class:
+
+* [`manage`](#-warewulf--service--manage)
+* [`enable`](#-warewulf--service--enable)
+* [`ensure`](#-warewulf--service--ensure)
+* [`service_name`](#-warewulf--service--service_name)
+
+##### <a name="-warewulf--service--manage"></a>`manage`
+
+Data type: `Boolean`
+
+Whether the service resource should be managed.
+
+Default value: `true`
+
+##### <a name="-warewulf--service--enable"></a>`enable`
+
+Data type: `Boolean`
+
+Whether the service should be enabled at boot.
+
+Default value: `true`
+
+##### <a name="-warewulf--service--ensure"></a>`ensure`
+
+Data type: `String`
+
+Desired state of the service (e.g. `running`, `stopped`).
+
+Default value: `'running'`
+
+##### <a name="-warewulf--service--service_name"></a>`service_name`
+
+Data type: `String`
+
+Name of the service to manage.
+
+Default value: `'warewulfd'`
 
 ## Resource types
 
 ### <a name="warewulf_image"></a>`warewulf_image`
 
+This type provides Puppet with the capabilities to manage Warewulf images.
+
+#### Examples
+
+##### 
+
+```puppet
 warewulf_image { 'foo':
   ensure => 'present',
+  oci_repository_url => 'rocky10'
 }
-
-This type provides Puppet with the capabilities to manage Warewulf images.
+```
 
 #### Properties
 

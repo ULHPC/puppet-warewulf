@@ -7,9 +7,10 @@ Puppet::ResourceApi.register_type(
   docs: <<~EOS,
     @summary a warewulf_image type
     @example
-    warewulf_image { 'foo':
-      ensure => 'present',
-    }
+      warewulf_image { 'foo':
+        ensure => 'present',
+        oci_repository_url => 'rocky10'
+      }
 
     This type provides Puppet with the capabilities to manage Warewulf images.
   EOS

@@ -109,8 +109,14 @@ warewulf::config::manage_images: true
 warewulf::config::purge_images: false
 warewulf::config::default_oci_repository_url: 'ghcr.io/warewulf'
 warewulf::config::images:
-  rocky8:
-    oci_repository_url: 'docker://ghcr.io/warewulf/rocky:8'
+  rocky-8:
+    build: true
+    syncuser: false
+    platform: 'arm64'
+    oci_remote_name: 'rocky:8'
+    oci_repository_url: 'ghcr.io/warewulf'
+    oci_repository_username: 'username'
+    oci_repository_password: 'password'
 warewulf::config::images: # or as an array of string
   - rocky8
   - rocky10
@@ -128,6 +134,8 @@ The following parameters are available in the `warewulf::config` class:
 * [`manage_images`](#-warewulf--config--manage_images)
 * [`purge_images`](#-warewulf--config--purge_images)
 * [`default_oci_repository_url`](#-warewulf--config--default_oci_repository_url)
+* [`default_oci_repository_password`](#-warewulf--config--default_oci_repository_password)
+* [`default_oci_repository_username`](#-warewulf--config--default_oci_repository_username)
 * [`images`](#-warewulf--config--images)
 * [`overlays_repo_src`](#-warewulf--config--overlays_repo_src)
 
@@ -181,9 +189,27 @@ Data type: `String`
 Default OCI repository URL used when defining images, unless overridden
 per image.
 
+##### <a name="-warewulf--config--default_oci_repository_password"></a>`default_oci_repository_password`
+
+Data type: `Optional[Sensitive[String]]`
+
+Default OCI repository password used when defining images, unless overridden
+per image.
+
+Default value: `undef`
+
+##### <a name="-warewulf--config--default_oci_repository_username"></a>`default_oci_repository_username`
+
+Data type: `Optional[String]`
+
+Default OCI repository username used when defining images, unless overridden
+per image.
+
+Default value: `undef`
+
 ##### <a name="-warewulf--config--images"></a>`images`
 
-Data type: `Optional[Variant[Hash[String, Optional[Hash]], Array[String]]]`
+Data type: `Optional[Variant[Sensitive[Hash[String, Optional[Hash]]],Hash[String, Optional[Hash]],Array[String]]]`
 
 Image definitions, either:
 - Hash[String, Hash]: image name => parameter hash
@@ -324,8 +350,14 @@ This type provides Puppet with the capabilities to manage Warewulf images.
 
 ```puppet
 warewulf_image { 'foo':
-  ensure => 'present',
-  oci_repository_url => 'rocky10'
+  ensure                  => 'present',
+  build                   => true,
+  syncuser                => true,
+  platform                => 'arm64',
+  oci_remote_name         => 'bar'
+  oci_repository_url      => 'ghcr.io/warewulf',
+  oci_repository_username => 'user',
+  oci_repository_password => 'password'
 }
 ```
 
@@ -345,8 +377,22 @@ Default value: `present`
 
 The following parameters are available in the `warewulf_image` type.
 
+* [`build`](#-warewulf_image--build)
 * [`name`](#-warewulf_image--name)
+* [`oci_remote_name`](#-warewulf_image--oci_remote_name)
+* [`oci_repository_password`](#-warewulf_image--oci_repository_password)
 * [`oci_repository_url`](#-warewulf_image--oci_repository_url)
+* [`oci_repository_username`](#-warewulf_image--oci_repository_username)
+* [`platform`](#-warewulf_image--platform)
+* [`syncuser`](#-warewulf_image--syncuser)
+
+##### <a name="-warewulf_image--build"></a>`build`
+
+Data type: `Boolean`
+
+Build image after pulling.
+
+Default value: `true`
 
 ##### <a name="-warewulf_image--name"></a>`name`
 
@@ -356,9 +402,39 @@ Data type: `String`
 
 The name of the Warewulf image.
 
+##### <a name="-warewulf_image--oci_remote_name"></a>`oci_remote_name`
+
+Data type: `Optional[String]`
+
+The OCI name on the repository.
+
+##### <a name="-warewulf_image--oci_repository_password"></a>`oci_repository_password`
+
+Data type: `Optional[Sensitive[String]]`
+
+The password for the access to the OCI registry.
+
 ##### <a name="-warewulf_image--oci_repository_url"></a>`oci_repository_url`
 
 Data type: `String`
 
 The OCI repository url.
+
+##### <a name="-warewulf_image--oci_repository_username"></a>`oci_repository_username`
+
+Data type: `Optional[String]`
+
+The username for the access to the OCI registry.
+
+##### <a name="-warewulf_image--platform"></a>`platform`
+
+Data type: `Optional[String]`
+
+Set other hardware platform e.g. amd64 or arm64.
+
+##### <a name="-warewulf_image--syncuser"></a>`syncuser`
+
+Data type: `Boolean`
+
+Synchronize UIDs/GIDs from host to image.
 

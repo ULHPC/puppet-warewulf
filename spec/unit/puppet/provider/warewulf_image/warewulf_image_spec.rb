@@ -54,10 +54,68 @@ rockylinux-10
   end
 
   describe 'create(context, name, should)' do
-    it 'creates the resource' do
-      provider.create(context, 'a', name: 'a', ensure: 'present', oci_repository_url: 'registry.example.com')
+    it 'import an image and build the pulled image' do
+      provider.create(context, 'a',
+                      name: 'a', ensure: 'present',
+                      build: true, syncuser: false,
+                      oci_repository_url: 'registry.example.com')
+
       expect(Puppet::Util::Execution).to have_received(:execute)
-        .with(['/bin/wwctl', 'image', 'import', 'docker://registry.example.com/a'])
+        .with(['/bin/wwctl', 'image', 'import', 'docker://registry.example.com/a', 'a', '--build'])
+    end
+
+    it 'import and rename an image' do
+      provider.create(context, 'a',
+                      name: 'a', ensure: 'present',
+                      build: true, syncuser: false,
+                      oci_remote_name: 'toaster',
+                      oci_repository_url: 'registry.example.com')
+
+      expect(Puppet::Util::Execution).to have_received(:execute)
+        .with(['/bin/wwctl', 'image', 'import', 'docker://registry.example.com/toaster', 'a', '--build'])
+    end
+
+    it 'import and skip build' do
+      provider.create(context, 'a',
+                      name: 'a', ensure: 'present',
+                      build: false, syncuser: false,
+                      oci_repository_url: 'registry.example.com')
+
+      expect(Puppet::Util::Execution).to have_received(:execute)
+        .with(['/bin/wwctl', 'image', 'import', 'docker://registry.example.com/a', 'a'])
+    end
+
+    it 'import and syncuser' do
+      provider.create(context, 'a',
+                      name: 'a', ensure: 'present',
+                      build: true, syncuser: true,
+                      oci_repository_url: 'registry.example.com')
+
+      expect(Puppet::Util::Execution).to have_received(:execute)
+        .with(['/bin/wwctl', 'image', 'import', 'docker://registry.example.com/a', 'a', '--build', '--syncuser'])
+    end
+
+    it 'import an arm64 image' do
+      provider.create(context, 'a',
+                      name: 'a', ensure: 'present',
+                      build: true, syncuser: false,
+                      platform: 'arm64',
+                      oci_repository_url: 'registry.example.com')
+
+      expect(Puppet::Util::Execution).to have_received(:execute)
+        .with(['/bin/wwctl', 'image', 'import', 'docker://registry.example.com/a', 'a', '--build', '--platform', 'arm64'])
+    end
+
+    it 'import an image from a registry that require auth' do
+      provider.create(context, 'a',
+                      name: 'a', ensure: 'present',
+                      build: true, syncuser: false,
+                      oci_repository_url: 'registry.example.com',
+                      oci_repository_username: 'toto',
+                      oci_repository_password: Puppet::Pops::Types::PSensitiveType::Sensitive.new('tata'))
+
+      expect(Puppet::Util::Execution).to have_received(:execute)
+        .with(['/bin/wwctl', 'image', 'import', 'docker://registry.example.com/a', 'a', '--build', '--username', 'toto', '--password', 'tata'])
     end
   end
 

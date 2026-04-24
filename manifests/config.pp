@@ -35,6 +35,14 @@
 #   Default OCI repository URL used when defining images, unless overridden
 #   per image.
 #
+# @param default_oci_repository_password
+#   Default OCI repository password used when defining images, unless overridden
+#   per image.
+#
+# @param default_oci_repository_username
+#   Default OCI repository username used when defining images, unless overridden
+#   per image.
+#
 # @param images
 #   Image definitions, either:
 #   - Hash[String, Hash]: image name => parameter hash
@@ -82,8 +90,14 @@
 #   warewulf::config::purge_images: false
 #   warewulf::config::default_oci_repository_url: 'ghcr.io/warewulf'
 #   warewulf::config::images:
-#     rocky8:
-#       oci_repository_url: 'docker://ghcr.io/warewulf/rocky:8'
+#     rocky-8:
+#       build: true
+#       syncuser: false
+#       platform: 'arm64'
+#       oci_remote_name: 'rocky:8'
+#       oci_repository_url: 'ghcr.io/warewulf'
+#       oci_repository_username: 'username'
+#       oci_repository_password: 'password'
 #   warewulf::config::images: # or as an array of string
 #     - rocky8
 #     - rocky10
@@ -97,8 +111,10 @@ class warewulf::config (
   Boolean $manage_images,
   Boolean $purge_images,
   String $default_oci_repository_url,
-  Optional[Variant[Hash[String, Optional[Hash]], Array[String]]] $images = undef,
+  Optional[Sensitive[String]] $default_oci_repository_password = undef,
+  Optional[String] $default_oci_repository_username = undef,
   Optional[String] $overlays_repo_src = undef,
+  Optional[Variant[Sensitive[Hash[String, Optional[Hash]]],Hash[String, Optional[Hash]],Array[String]]] $images = undef,
 ) {
   if ($warewulf::manage_tftp_server) {
     systemd::dropin_file { 'tftp-server.conf':
@@ -158,6 +174,7 @@ class warewulf::config (
 
     $images_hash = $images ? {
       Array[String] => Hash($images.map |$img| { [$img, {}] }),
+      Sensitive[Hash] => $images.unwrap,
       default       => $images,
     }
 
@@ -167,9 +184,21 @@ class warewulf::config (
         default => $image_params,
       }
 
+      $params_with_defaults = merge({
+        'oci_repository_url'      => $default_oci_repository_url,
+        'oci_repository_username' => $default_oci_repository_username,
+        'oci_repository_password' => $default_oci_repository_password.unwrap,
+      }, $params)
+
       warewulf_image { $image:
-        ensure             => present,
-        oci_repository_url => pick($params['oci_repository_url'], $default_oci_repository_url),
+        ensure                  => present,
+        build                   => $params_with_defaults['build'],
+        syncuser                => $params_with_defaults['syncuser'],
+        platform                => $params_with_defaults['platform'],
+        oci_remote_name         => $params_with_defaults['oci_remote_name'],
+        oci_repository_url      => $params_with_defaults['oci_repository_url'],
+        oci_repository_username => $params_with_defaults['oci_repository_username'],
+        oci_repository_password => Sensitive($params_with_defaults['oci_repository_password']),
       }
     }
 

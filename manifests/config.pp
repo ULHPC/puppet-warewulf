@@ -114,7 +114,7 @@ class warewulf::config (
   Optional[String] $default_oci_repository_password = undef,
   Optional[String] $default_oci_repository_username = undef,
   Optional[String] $overlays_repo_src = undef,
-  Optional[Variant[Hash[String, Optional[Hash]], Array[String]]] $images = undef,
+  Optional[Variant[Sensitive[Hash[String, Optional[Hash]]],Hash[String, Optional[Hash]],Array[String]]] $images = undef,
 ) {
   if ($warewulf::manage_tftp_server) {
     systemd::dropin_file { 'tftp-server.conf':
@@ -174,6 +174,7 @@ class warewulf::config (
 
     $images_hash = $images ? {
       Array[String] => Hash($images.map |$img| { [$img, {}] }),
+      Sensitive[Hash] => $images.unwrap,
       default       => $images,
     }
 
@@ -184,9 +185,9 @@ class warewulf::config (
       }
 
       $params_with_defaults = merge({
-          'oci_repository_url'      => $default_oci_repository_url,
-          'oci_repository_username' => $default_oci_repository_username,
-          'oci_repository_password' => $default_oci_repository_password,
+        'oci_repository_url'      => $default_oci_repository_url,
+        'oci_repository_username' => $default_oci_repository_username,
+        'oci_repository_password' => $default_oci_repository_password,
       }, $params)
 
       warewulf_image { $image:
@@ -197,7 +198,7 @@ class warewulf::config (
         oci_remote_name         => $params_with_defaults['oci_remote_name'],
         oci_repository_url      => $params_with_defaults['oci_repository_url'],
         oci_repository_username => $params_with_defaults['oci_repository_username'],
-        oci_repository_password => $params_with_defaults['oci_repository_password'],
+        oci_repository_password => Sensitive($params_with_defaults['oci_repository_password']),
       }
     }
 

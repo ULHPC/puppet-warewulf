@@ -112,7 +112,7 @@ rockylinux-10
                       build: true, syncuser: false,
                       oci_repository_url: 'registry.example.com',
                       oci_repository_username: 'toto',
-                      oci_repository_password: 'tata')
+                      oci_repository_password: Puppet::Pops::Types::PSensitiveType::Sensitive.new('tata'))
 
       expect(Puppet::Util::Execution).to have_received(:execute)
         .with(['/bin/wwctl', 'image', 'import', 'docker://registry.example.com/a', 'a', '--build', '--username', 'toto', '--password', 'tata'])

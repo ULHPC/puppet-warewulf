@@ -59,7 +59,7 @@ Puppet::ResourceApi.register_type(
       behaviour: :parameter,
     },
     oci_repository_password: {
-      type: 'Optional[String]',
+      type: 'Optional[Sensitive[String]]',
       desc: 'The password for the access to the OCI registry.',
       behaviour: :parameter,
     },

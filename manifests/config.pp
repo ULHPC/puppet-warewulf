@@ -111,7 +111,7 @@ class warewulf::config (
   Boolean $manage_images,
   Boolean $purge_images,
   String $default_oci_repository_url,
-  Optional[String] $default_oci_repository_password = undef,
+  Optional[Sensitive[String]] $default_oci_repository_password = undef,
   Optional[String] $default_oci_repository_username = undef,
   Optional[String] $overlays_repo_src = undef,
   Optional[Variant[Sensitive[Hash[String, Optional[Hash]]],Hash[String, Optional[Hash]],Array[String]]] $images = undef,
@@ -187,7 +187,7 @@ class warewulf::config (
       $params_with_defaults = merge({
         'oci_repository_url'      => $default_oci_repository_url,
         'oci_repository_username' => $default_oci_repository_username,
-        'oci_repository_password' => $default_oci_repository_password,
+        'oci_repository_password' => $default_oci_repository_password.unwrap,
       }, $params)
 
       warewulf_image { $image:

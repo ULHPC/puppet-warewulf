@@ -41,6 +41,7 @@ class Puppet::Provider::WarewulfImage::WarewulfImage < Puppet::ResourceApi::Simp
     ]
 
     cmd.append('--build') if should[:build]
+    cmd.append('--syncuser') if should[:syncuser]
 
     wwctl(*cmd)
   end

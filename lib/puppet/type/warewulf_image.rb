@@ -32,6 +32,12 @@ Puppet::ResourceApi.register_type(
       default: true,
       behaviour: :parameter,
     },
+    syncuser: {
+      type: 'Boolean',
+      desc: 'Synchronize UIDs/GIDs from host to image.',
+      default: false,
+      behaviour: :parameter,
+    },
     oci_remote_name: {
       type: 'Optional[String]',
       desc: 'The OCI name on the repository.',

@@ -55,21 +55,44 @@ rockylinux-10
 
   describe 'create(context, name, should)' do
     it 'import an image and build the pulled image' do
-      provider.create(context, 'a', name: 'a', ensure: 'present', build: true, oci_repository_url: 'registry.example.com')
+      provider.create(context, 'a',
+                      name: 'a', ensure: 'present',
+                      build: true, syncuser: false,
+                      oci_repository_url: 'registry.example.com')
+
       expect(Puppet::Util::Execution).to have_received(:execute)
         .with(['/bin/wwctl', 'image', 'import', 'docker://registry.example.com/a', 'a', '--build'])
     end
 
     it 'import and rename an image' do
-      provider.create(context, 'a', name: 'a', ensure: 'present', build: true, oci_remote_name: 'toaster', oci_repository_url: 'registry.example.com')
+      provider.create(context, 'a',
+                      name: 'a', ensure: 'present',
+                      build: true, syncuser: false,
+                      oci_remote_name: 'toaster',
+                      oci_repository_url: 'registry.example.com')
+
       expect(Puppet::Util::Execution).to have_received(:execute)
         .with(['/bin/wwctl', 'image', 'import', 'docker://registry.example.com/toaster', 'a', '--build'])
     end
 
     it 'import and skip build' do
-      provider.create(context, 'a', name: 'a', ensure: 'present', build: false, oci_repository_url: 'registry.example.com')
+      provider.create(context, 'a',
+                      name: 'a', ensure: 'present',
+                      build: false, syncuser: false,
+                      oci_repository_url: 'registry.example.com')
+
       expect(Puppet::Util::Execution).to have_received(:execute)
         .with(['/bin/wwctl', 'image', 'import', 'docker://registry.example.com/a', 'a'])
+    end
+
+    it 'import and syncuser' do
+      provider.create(context, 'a',
+                      name: 'a', ensure: 'present',
+                      build: true, syncuser: true,
+                      oci_repository_url: 'registry.example.com')
+
+      expect(Puppet::Util::Execution).to have_received(:execute)
+        .with(['/bin/wwctl', 'image', 'import', 'docker://registry.example.com/a', 'a', '--build', '--syncuser'])
     end
   end
 

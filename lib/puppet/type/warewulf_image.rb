@@ -38,6 +38,11 @@ Puppet::ResourceApi.register_type(
       default: false,
       behaviour: :parameter,
     },
+    platform: {
+      type: 'Optional[String]',
+      desc: 'Set other hardware platform e.g. amd64 or arm64.',
+      behaviour: :parameter,
+    },
     oci_remote_name: {
       type: 'Optional[String]',
       desc: 'The OCI name on the repository.',

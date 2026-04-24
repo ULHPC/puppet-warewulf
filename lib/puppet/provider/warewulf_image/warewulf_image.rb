@@ -29,7 +29,6 @@ class Puppet::Provider::WarewulfImage::WarewulfImage < Puppet::ResourceApi::Simp
   # @param context [Puppet::ResourceApi::BaseContext] The context for logging and debugging
   # @param name [String] The image name to add
   # @param should [Hash] additional parameters
-  # @return [String] The path of wwctl.
   #
   def create(context, name, should)
     context.debug("Importing image '#{name}' with #{should.inspect}")
@@ -42,6 +41,7 @@ class Puppet::Provider::WarewulfImage::WarewulfImage < Puppet::ResourceApi::Simp
 
     cmd.append('--build') if should[:build]
     cmd.append('--syncuser') if should[:syncuser]
+    cmd.append('--platform', should[:platform]) if should[:platform]
 
     wwctl(*cmd)
   end
@@ -50,7 +50,6 @@ class Puppet::Provider::WarewulfImage::WarewulfImage < Puppet::ResourceApi::Simp
   #
   # @param context [Puppet::ResourceApi::BaseContext] The context for logging and debugging
   # @param name [String] The image name to remove
-  # @return [String] The path of wwctl.
   #
   def delete(context, name)
     context.debug("Deleting image '#{name}'")

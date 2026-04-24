@@ -94,6 +94,17 @@ rockylinux-10
       expect(Puppet::Util::Execution).to have_received(:execute)
         .with(['/bin/wwctl', 'image', 'import', 'docker://registry.example.com/a', 'a', '--build', '--syncuser'])
     end
+
+    it 'import an arm64 image' do
+      provider.create(context, 'a',
+                      name: 'a', ensure: 'present',
+                      build: true, syncuser: false,
+                      platform: 'arm64',
+                      oci_repository_url: 'registry.example.com')
+
+      expect(Puppet::Util::Execution).to have_received(:execute)
+        .with(['/bin/wwctl', 'image', 'import', 'docker://registry.example.com/a', 'a', '--build', '--platform', 'arm64'])
+    end
   end
 
   describe 'delete(context, name)' do

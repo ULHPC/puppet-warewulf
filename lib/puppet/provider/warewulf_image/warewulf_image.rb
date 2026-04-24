@@ -42,6 +42,8 @@ class Puppet::Provider::WarewulfImage::WarewulfImage < Puppet::ResourceApi::Simp
     cmd.append('--build') if should[:build]
     cmd.append('--syncuser') if should[:syncuser]
     cmd.append('--platform', should[:platform]) if should[:platform]
+    cmd.append('--username', should[:oci_repository_username]) if should[:oci_repository_username]
+    cmd.append('--password', should[:oci_repository_password]) if should[:oci_repository_password]
 
     wwctl(*cmd)
   end

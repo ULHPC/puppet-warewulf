@@ -105,6 +105,18 @@ rockylinux-10
       expect(Puppet::Util::Execution).to have_received(:execute)
         .with(['/bin/wwctl', 'image', 'import', 'docker://registry.example.com/a', 'a', '--build', '--platform', 'arm64'])
     end
+
+    it 'import an image from a registry that require auth' do
+      provider.create(context, 'a',
+                      name: 'a', ensure: 'present',
+                      build: true, syncuser: false,
+                      oci_repository_url: 'registry.example.com',
+                      oci_repository_username: 'toto',
+                      oci_repository_password: 'tata')
+
+      expect(Puppet::Util::Execution).to have_received(:execute)
+        .with(['/bin/wwctl', 'image', 'import', 'docker://registry.example.com/a', 'a', '--build', '--username', 'toto', '--password', 'tata'])
+    end
   end
 
   describe 'delete(context, name)' do

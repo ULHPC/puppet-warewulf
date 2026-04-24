@@ -8,8 +8,14 @@ Puppet::ResourceApi.register_type(
     @summary a warewulf_image type
     @example
       warewulf_image { 'foo':
-        ensure => 'present',
-        oci_repository_url => 'rocky10'
+        ensure                  => 'present',
+        build                   => true,
+        syncuser                => true,
+        platform                => 'arm64',
+        oci_remote_name         => 'bar'
+        oci_repository_url      => 'ghcr.io/warewulf',
+        oci_repository_username => 'user',
+        oci_repository_password => 'password'
       }
 
     This type provides Puppet with the capabilities to manage Warewulf images.

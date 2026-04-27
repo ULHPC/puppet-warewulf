@@ -1,6 +1,6 @@
 {
   "name": "ULHPC-warewulf",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "author": "UL HPC Team",
   "summary": "Puppet module to configure and manage warewulf",
   "license": "Apache-2.0",

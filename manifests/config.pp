@@ -119,7 +119,7 @@ class warewulf::config (
   if ($warewulf::manage_tftp_server) {
     systemd::dropin_file { 'tftp-server.conf':
       unit    => 'tftp.socket',
-      content => "[Socket]\nListenDatagram=\nListenDatagram=${split($address, '/')[0]}:69\n",
+      content => "[Socket]\nFreeBind=yes\nListenDatagram=\nListenDatagram=${split($address, '/')[0]}:69\n",
     }
   }
 

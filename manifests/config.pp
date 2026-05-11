@@ -139,7 +139,7 @@ class warewulf::config (
   exec { 'warewulf_configure':
     command     => 'wwctl configure --all',
     environment => 'HOME=/root',
-    subscribe   => File['/etc/warewulf/warewulf.conf'],
+    subscribe   => [File['/etc/warewulf/warewulf.conf'], File['/etc/warewulf/nodes.conf']],
     notify      => Service['warewulfd'],
     refreshonly => true,
   }

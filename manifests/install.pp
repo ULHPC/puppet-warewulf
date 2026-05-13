@@ -41,7 +41,7 @@ class warewulf::install (
         }
 
         package { 'warewulf':
-          ensure => 'present',
+          ensure => $warewulf_version,
           source => "https://github.com/warewulf/warewulf/releases/download/v${warewulf_version}/warewulf-${warewulf_version}-1.el${facts['os']['release']['major']}.${facts['os']['architecture']}.rpm",
         }
       }

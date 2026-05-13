@@ -4,6 +4,19 @@ All notable changes to this project will be documented in this file.
 Each new release typically also includes the latest modulesync defaults.
 These should not affect the functionality of the module.
 
+## [v1.1.0](https://github.com/ULHPC/puppet-warewulf/tree/v1.1.0) (2026-05-13)
+
+[Full Changelog](https://github.com/ULHPC/puppet-warewulf/compare/v1.0.1...v1.1.0)
+
+**Implemented enhancements:**
+
+- Bump warewulf version to 4.7.0 [\#8](https://github.com/ULHPC/puppet-warewulf/pull/8) ([LeGmask](https://github.com/LeGmask))
+
+**Fixed bugs:**
+
+- Package: ensure to $warewulf\_version allowing {up,down}grade [\#10](https://github.com/ULHPC/puppet-warewulf/pull/10) ([LeGmask](https://github.com/LeGmask))
+- Run wwctl clean after operations on images to avoid disk exhaustion [\#9](https://github.com/ULHPC/puppet-warewulf/pull/9) ([LeGmask](https://github.com/LeGmask))
+
 ## [v1.0.1](https://github.com/ULHPC/puppet-warewulf/tree/v1.0.1) (2026-05-12)
 
 [Full Changelog](https://github.com/ULHPC/puppet-warewulf/compare/v1.0.0...v1.0.1)

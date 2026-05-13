@@ -1,7 +1,7 @@
 warewulf::manage_tftp_server: true
 
 warewulf::install::enable: true
-warewulf::install::version: 4.6.5
+warewulf::install::version: 4.7.0
 warewulf::install::tftp_server_ensure: "latest"
 
 warewulf::config::manage_images: false

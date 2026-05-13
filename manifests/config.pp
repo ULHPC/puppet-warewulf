@@ -169,6 +169,12 @@ class warewulf::config (
     refreshonly => true,
   }
 
+  exec { 'warewulf_clean':
+    command     => 'wwctl clean',
+    environment => 'HOME=/root',
+    refreshonly => true,
+  }
+
   if ($manage_images and $images) {
     resources { 'warewulf_image': purge => $purge_images }
 
@@ -206,5 +212,6 @@ class warewulf::config (
     -> Exec['warewulf_configure']
     -> Resources['warewulf_image']
     -> Warewulf_image <| |>
+    ~> Exec['warewulf_clean']
   }
 }

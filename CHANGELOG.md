@@ -4,6 +4,14 @@ All notable changes to this project will be documented in this file.
 Each new release typically also includes the latest modulesync defaults.
 These should not affect the functionality of the module.
 
+## [v1.1.1](https://github.com/ULHPC/puppet-warewulf/tree/v1.1.1) (2026-06-15)
+
+[Full Changelog](https://github.com/ULHPC/puppet-warewulf/compare/v1.1.0...v1.1.1)
+
+**Fixed bugs:**
+
+- fix\(manifests/config\): losen umask of overlays vcsrepo  [\#12](https://github.com/ULHPC/puppet-warewulf/pull/12) ([LeGmask](https://github.com/LeGmask))
+
 ## [v1.1.0](https://github.com/ULHPC/puppet-warewulf/tree/v1.1.0) (2026-05-13)
 
 [Full Changelog](https://github.com/ULHPC/puppet-warewulf/compare/v1.0.1...v1.1.0)

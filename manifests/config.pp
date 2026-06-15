@@ -149,7 +149,7 @@ class warewulf::config (
       ensure   => latest,
       provider => git,
       source   => $overlays_repo_src,
-      umask    => '027',
+      umask    => '022',
       notify   => Exec['warewulf_overlay_build'],
     }
 
